@@ -23,8 +23,8 @@ public class Operator {
         Stream stream  = new Stream();
         Config config = new Config();
         EventAll filter = new EventAll(
-                config.getConfigValue("url", "\"\""),
-                config.getConfigValue("eventId", "\"\"")
+                config.getConfigValue("url", ""),
+                config.getConfigValue("eventId", "")
         );
         stream.start(filter);
     }
