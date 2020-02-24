@@ -22,9 +22,14 @@ public class Operator {
     public static void main(String[] args) {
         Stream stream  = new Stream();
         Config config = new Config();
+        String converterUrl = config.getConfigValue("converterUrl", "");
+        String convertFrom = config.getConfigValue("convertFrom", "");
+        String convertTo = config.getConfigValue("convertTo", "");
+        Converter converter = new Converter(converterUrl, convertFrom, convertTo);
         EventAll filter = new EventAll(
                 config.getConfigValue("url", ""),
-                config.getConfigValue("eventId", "")
+                config.getConfigValue("eventId", ""),
+                converter
         );
         stream.start(filter);
     }

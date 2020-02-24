@@ -31,10 +31,12 @@ import java.io.IOException;
 public class EventAll implements OperatorInterface {
     private String url;
     private String eventId;
+    private Converter converter;
 
-    public EventAll(String url, String eventId) {
+    public EventAll(String url, String eventId, Converter converter) {
         this.url = url;
         this.eventId = eventId;
+        this.converter = converter;
     }
 
     @Override
@@ -48,26 +50,28 @@ public class EventAll implements OperatorInterface {
     }
 
     private void trigger(Input input){
-        Object value;
-        try{
-            value = input.getValue();
-        }catch (Exception e){
-            value = input.getString();
-        }
-
-        JSONObject json = new JSONObject()
-                .put("messageName", this.eventId)
-                .put("all", true)
-                .put("resultEnabled", true)
-                .put("localVariables", new JSONObject()
-                        .put("event", new JSONObject()
-                                .put("value", value)
-                        )
-                );
-
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-
         try {
+            Object value;
+            try{
+                value = input.getValue();
+            }catch (Exception e){
+                value = input.getString();
+            }
+            if(this.converter != null){
+                value = this.converter.convert(value);
+            }
+
+            JSONObject json = new JSONObject()
+                    .put("messageName", this.eventId)
+                    .put("all", true)
+                    .put("resultEnabled", true)
+                    .put("localVariables", new JSONObject()
+                            .put("event", new JSONObject()
+                                    .put("value", value)
+                            )
+                    );
+
             HttpPost request = new HttpPost(this.url);
             StringEntity params = new StringEntity(json.toString());
             request.addHeader("content-type", "application/json");

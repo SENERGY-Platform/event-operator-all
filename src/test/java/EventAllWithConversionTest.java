@@ -20,7 +20,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -29,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class EventAllTest {
+public class EventAllWithConversionTest {
     public static boolean called = false;
     private static Object processVariable = null;
 
@@ -45,7 +44,7 @@ public class EventAllTest {
     }
 
     private void test(Object messageValue, boolean expectedToTrigger) throws IOException {
-        EventAllTest.called = false;
+        EventAllWithConversionTest.called = false;
         HttpServer server = TriggerServerMock.create(inputStream -> {
             JSONParser jsonParser = new JSONParser();
             try {
@@ -55,22 +54,24 @@ public class EventAllTest {
                         && ((JSONObject)jsonObject.get("localVariables")).containsKey("event")
                         && ((JSONObject)((JSONObject)jsonObject.get("localVariables")).get("event")).containsKey("value")
                 ){
-                    EventAllTest.called = true;
-                    EventAllTest.processVariable = ((JSONObject)((JSONObject)jsonObject.get("localVariables")).get("event")).get("value");
+                    EventAllWithConversionTest.called = true;
+                    EventAllWithConversionTest.processVariable = ((JSONObject)((JSONObject)jsonObject.get("localVariables")).get("event")).get("value");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        EventAll events = new EventAll("http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", new Converter("", "", ""));
+        HttpServer converterServer = ConverterServerMock.create("/inCharacteristic/outCharacteristic");
+        Converter converter = new Converter("http://localhost:"+converterServer.getAddress().getPort(), "inCharacteristic", "outCharacteristic");
+        EventAll events = new EventAll("http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", converter);
         Message msg = TestMessageProvider.getTestMessage(messageValue);
         events.config(msg);
         events.run(msg);
         server.stop(0);
-        Assert.assertEquals(EventAllTest.called, expectedToTrigger);
+        Assert.assertEquals(EventAllWithConversionTest.called, expectedToTrigger);
         if(expectedToTrigger){
             try {
-                Object a = jsonNormalize(EventAllTest.processVariable);
+                Object a = jsonNormalize(EventAllWithConversionTest.processVariable);
                 Object b = jsonNormalize(messageValue);
                 Assert.assertEquals(a, b);
             } catch (ParseException e) {
