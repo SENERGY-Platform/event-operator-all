@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -50,7 +51,8 @@ public class EventAll implements OperatorInterface {
     }
 
     private void trigger(Input input){
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10 * 1000).build();
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
         try {
             Object value;
             try{
@@ -65,8 +67,8 @@ public class EventAll implements OperatorInterface {
             JSONObject json = new JSONObject()
                     .put("messageName", this.eventId)
                     .put("all", true)
-                    .put("resultEnabled", true)
-                    .put("localVariables", new JSONObject()
+                    .put("resultEnabled", false)
+                    .put("processVariablesLocal", new JSONObject()
                             .put("event", new JSONObject()
                                     .put("value", value)
                             )
