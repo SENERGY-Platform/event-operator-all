@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import org.infai.seits.sepl.operators.Config;
-import org.infai.seits.sepl.operators.Stream;
+import org.infai.ses.senergy.operators.Config;
+import org.infai.ses.senergy.operators.Stream;
+import org.infai.ses.senergy.utils.ConfigProvider;
 
 public class Operator {
 
     public static void main(String[] args) {
         Stream stream  = new Stream();
-        Config config = new Config();
+        Config config = ConfigProvider.getConfig();
         String converterUrl = config.getConfigValue("converterUrl", "");
         String convertFrom = config.getConfigValue("convertFrom", "");
         String convertTo = config.getConfigValue("convertTo", "");

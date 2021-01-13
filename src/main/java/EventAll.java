@@ -20,16 +20,15 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.infai.seits.sepl.operators.Input;
-import org.infai.seits.sepl.operators.Message;
-import org.infai.seits.sepl.operators.OperatorInterface;
+import org.infai.ses.senergy.operators.BaseOperator;
+import org.infai.ses.senergy.operators.Input;
+import org.infai.ses.senergy.operators.Message;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 
 import java.io.IOException;
 
 
-public class EventAll implements OperatorInterface {
+public class EventAll extends BaseOperator {
     private String url;
     private String eventId;
     private Converter converter;
@@ -92,7 +91,8 @@ public class EventAll implements OperatorInterface {
     }
 
     @Override
-    public void config(Message message) {
+    public Message configMessage(Message message) {
         message.addInput("value");
+        return message;
     }
 }

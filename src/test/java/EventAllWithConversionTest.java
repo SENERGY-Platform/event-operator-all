@@ -15,7 +15,13 @@
  */
 
 import com.sun.net.httpserver.HttpServer;
-import org.infai.seits.sepl.operators.Message;
+import org.infai.ses.senergy.models.DeviceMessageModel;
+import org.infai.ses.senergy.models.MessageModel;
+import org.infai.ses.senergy.operators.Config;
+import org.infai.ses.senergy.operators.Helper;
+import org.infai.ses.senergy.operators.Message;
+import org.infai.ses.senergy.testing.utils.JSONHelper;
+import org.infai.ses.senergy.utils.ConfigProvider;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -64,9 +70,19 @@ public class EventAllWithConversionTest {
         HttpServer converterServer = ConverterServerMock.create("/inCharacteristic/outCharacteristic");
         Converter converter = new Converter("http://localhost:"+converterServer.getAddress().getPort(), "inCharacteristic", "outCharacteristic");
         EventAll events = new EventAll("http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", converter);
-        Message msg = TestMessageProvider.getTestMessage(messageValue);
-        events.config(msg);
-        events.run(msg);
+        Config config = new Config(new JSONHelper().parseFile("config.json").toString());
+        ConfigProvider.setConfig(config);
+        MessageModel model = new MessageModel();
+        Message message = new Message();
+        events.configMessage(message);
+        JSONObject m = new JSONHelper().parseFile("message.json");
+        ((JSONObject)((JSONObject) m.get("value")).get("reading")).put("value", messageValue);
+        DeviceMessageModel deviceMessageModel = JSONHelper.getObjectFromJSONString(m.toString(), DeviceMessageModel.class);
+        assert deviceMessageModel != null;
+        String topicName = config.getInputTopicsConfigs().get(0).getName();
+        model.putMessage(topicName, Helper.deviceToInputMessageModel(deviceMessageModel, topicName));
+        message.setMessage(model);
+        events.run(message);
         server.stop(0);
         Assert.assertEquals(EventAllWithConversionTest.called, expectedToTrigger);
         if(expectedToTrigger){

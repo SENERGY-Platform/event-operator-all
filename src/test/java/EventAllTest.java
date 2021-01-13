@@ -15,12 +15,18 @@
  */
 
 import com.sun.net.httpserver.HttpServer;
-import org.infai.seits.sepl.operators.Message;
+import org.infai.ses.senergy.models.DeviceMessageModel;
+import org.infai.ses.senergy.models.MessageModel;
+import org.infai.ses.senergy.operators.Config;
+import org.infai.ses.senergy.operators.Helper;
+import org.infai.ses.senergy.operators.Message;
+import org.infai.ses.senergy.testing.utils.JSONHelper;
+import org.infai.ses.senergy.utils.ConfigProvider;
+import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -63,9 +69,19 @@ public class EventAllTest {
             }
         });
         EventAll events = new EventAll("http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", new Converter("", "", ""));
-        Message msg = TestMessageProvider.getTestMessage(messageValue);
-        events.config(msg);
-        events.run(msg);
+        Config config = new Config(new JSONHelper().parseFile("config.json").toString());
+        ConfigProvider.setConfig(config);
+        MessageModel model = new MessageModel();
+        Message message = new Message();
+        events.configMessage(message);
+        JSONObject m = new JSONHelper().parseFile("message.json");
+        ((JSONObject)((JSONObject) m.get("value")).get("reading")).put("value", messageValue);
+        DeviceMessageModel deviceMessageModel = JSONHelper.getObjectFromJSONString(m.toString(), DeviceMessageModel.class);
+        assert deviceMessageModel != null;
+        String topicName = config.getInputTopicsConfigs().get(0).getName();
+        model.putMessage(topicName, Helper.deviceToInputMessageModel(deviceMessageModel, topicName));
+        message.setMessage(model);
+        events.run(message);
         server.stop(0);
         Assert.assertEquals(EventAllTest.called, expectedToTrigger);
         if(expectedToTrigger){
