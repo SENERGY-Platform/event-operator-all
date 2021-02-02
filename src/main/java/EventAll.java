@@ -21,6 +21,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.infai.ses.senergy.operators.BaseOperator;
+import org.infai.ses.senergy.operators.FlexInput;
 import org.infai.ses.senergy.operators.Input;
 import org.infai.ses.senergy.operators.Message;
 import org.json.JSONObject;
@@ -42,14 +43,14 @@ public class EventAll extends BaseOperator {
     @Override
     public void run(Message message) {
         try{
-            Input input = message.getInput("value");
+            FlexInput input = message.getFlexInput("value");
             this.trigger(input);
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    private void trigger(Input input){
+    private void trigger(FlexInput input){
         RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10 * 1000).build();
         CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
         try {
@@ -92,7 +93,7 @@ public class EventAll extends BaseOperator {
 
     @Override
     public Message configMessage(Message message) {
-        message.addInput("value");
+        message.addFlexInput("value");
         return message;
     }
 }
