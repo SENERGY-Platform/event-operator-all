@@ -62,7 +62,7 @@ public class EventAllTest {
                 e.printStackTrace();
             }
         });
-        EventAll events = new EventAll("http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", new Converter("", "", ""));
+        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", new Converter("", "", ""));
         Message msg = TestMessageProvider.getTestMessage(messageValue);
         events.config(msg);
         events.run(msg);

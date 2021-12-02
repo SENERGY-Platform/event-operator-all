@@ -33,11 +33,13 @@ public class EventAll implements OperatorInterface {
     private String url;
     private String eventId;
     private Converter converter;
+    private String userToken;
 
-    public EventAll(String url, String eventId, Converter converter) {
+    public EventAll(String userToken, String url, String eventId, Converter converter) {
         this.url = url;
         this.eventId = eventId;
         this.converter = converter;
+        this.userToken = userToken;
     }
 
     @Override
@@ -77,6 +79,9 @@ public class EventAll implements OperatorInterface {
             HttpPost request = new HttpPost(this.url);
             StringEntity params = new StringEntity(json.toString());
             request.addHeader("content-type", "application/json");
+            if (!this.userToken.equals("")) {
+                request.addHeader("Authorization", userToken);
+            }
             request.setEntity(params);
             CloseableHttpResponse resp = httpClient.execute(request);
             resp.close();

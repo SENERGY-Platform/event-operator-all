@@ -63,7 +63,7 @@ public class EventAllWithConversionTest {
         });
         HttpServer converterServer = ConverterServerMock.create("/inCharacteristic/outCharacteristic");
         Converter converter = new Converter("http://localhost:"+converterServer.getAddress().getPort(), "inCharacteristic", "outCharacteristic");
-        EventAll events = new EventAll("http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", converter);
+        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", converter);
         Message msg = TestMessageProvider.getTestMessage(messageValue);
         events.config(msg);
         events.run(msg);
