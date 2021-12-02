@@ -68,7 +68,7 @@ public class EventAllTest {
                 e.printStackTrace();
             }
         });
-        EventAll events = new EventAll("http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", new Converter("", "", ""));
+        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", new Converter("", "", ""));
         Config config = new Config(new JSONHelper().parseFile("config.json").toString());
         ConfigProvider.setConfig(config);
         MessageModel model = new MessageModel();

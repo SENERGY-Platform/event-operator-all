@@ -26,8 +26,11 @@ public class Operator {
         String converterUrl = config.getConfigValue("converterUrl", "");
         String convertFrom = config.getConfigValue("convertFrom", "");
         String convertTo = config.getConfigValue("convertTo", "");
+        String userToken = config.getConfigValue("userToken", "");
+
         Converter converter = new Converter(converterUrl, convertFrom, convertTo);
         EventAll filter = new EventAll(
+                userToken,
                 config.getConfigValue("url", ""),
                 config.getConfigValue("eventId", ""),
                 converter
