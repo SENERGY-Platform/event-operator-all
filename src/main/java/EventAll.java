@@ -27,6 +27,10 @@ import org.infai.ses.senergy.operators.Message;
 import org.json.JSONObject;
 import org.infai.ses.senergy.exceptions.NoValueException;
 import org.json.JSONException;
+import java.io.StringWriter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.io.IOException;
 
@@ -62,6 +66,9 @@ public class EventAll extends BaseOperator {
     private void trigger(Object value){
         JSONObject json;
         try {
+            if(mustBeMarshalled(value)) {
+                value = this.objToJsonStr(value);
+            }
             json = new JSONObject()
                     .put("messageName", this.eventId)
                     .put("all", true)
@@ -71,7 +78,7 @@ public class EventAll extends BaseOperator {
                                     .put("value", value)
                             )
                     );
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return;
         }
@@ -104,5 +111,38 @@ public class EventAll extends BaseOperator {
     public Message configMessage(Message message) {
         message.addFlexInput("value");
         return message;
+    }
+
+    private String objToJsonStr(Object in) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        StringWriter writer = new StringWriter();
+        mapper.writeValue(writer, in);
+        return writer.toString();
+    }
+
+    public static boolean mustBeMarshalled(Object object)
+    {
+        Class<?> clazz = object.getClass();
+        return !(object instanceof String) && !clazz.isPrimitive() && !isWrapperType(clazz);
+    }
+
+    public static boolean isWrapperType(Class<?> clazz)
+    {
+        return getWrapperTypes().contains(clazz);
+    }
+
+    private static Set<Class<?>> getWrapperTypes()
+    {
+        Set<Class<?>> ret = new HashSet<Class<?>>();
+        ret.add(Boolean.class);
+        ret.add(Character.class);
+        ret.add(Byte.class);
+        ret.add(Short.class);
+        ret.add(Integer.class);
+        ret.add(Long.class);
+        ret.add(Float.class);
+        ret.add(Double.class);
+        ret.add(Void.class);
+        return ret;
     }
 }
