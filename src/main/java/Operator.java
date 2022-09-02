@@ -27,8 +27,11 @@ public class Operator {
         String convertFrom = config.getConfigValue("convertFrom", "");
         String convertTo = config.getConfigValue("convertTo", "");
         String userToken = config.getConfigValue("userToken", "");
+        String castExtension = config.getConfigValue("castExtensions", "");
+        String extendedConverterUrl = config.getConfigValue("extendedConverterUrl", "");
+        String topicToPathAndCharacteristic = config.getConfigValue("topicToPathAndCharacteristic", "");
 
-        Converter converter = new Converter(converterUrl, convertFrom, convertTo);
+        Converter converter = new Converter(extendedConverterUrl, converterUrl, convertFrom, convertTo, topicToPathAndCharacteristic, castExtension);
         EventAll filter = new EventAll(
                 userToken,
                 config.getConfigValue("url", ""),
