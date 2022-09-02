@@ -25,6 +25,8 @@ import org.infai.ses.senergy.operators.FlexInput;
 import org.infai.ses.senergy.operators.Input;
 import org.infai.ses.senergy.operators.Message;
 import org.json.JSONObject;
+import org.infai.ses.senergy.exceptions.NoValueException;
+import org.json.JSONException;
 
 import java.io.IOException;
 
@@ -46,27 +48,21 @@ public class EventAll extends BaseOperator {
     public void run(Message message) {
         try{
             FlexInput input = message.getFlexInput("value");
-            this.trigger(input);
+            Object value = this.getValueOfInput(input);
+            this.trigger(value);
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    private void trigger(FlexInput input){
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10 * 1000).build();
-        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
-        try {
-            Object value;
-            try{
-                value = input.getValue();
-            }catch (Exception e){
-                value = input.getString();
-            }
-            if(this.converter != null){
-                value = this.converter.convert(value);
-            }
+    private Object getValueOfInput(FlexInput input) throws IOException, NoValueException {
+        return this.converter.convert(input, input.getValue(Object.class));
+    }
 
-            JSONObject json = new JSONObject()
+    private void trigger(Object value){
+        JSONObject json;
+        try {
+            json = new JSONObject()
                     .put("messageName", this.eventId)
                     .put("all", true)
                     .put("resultEnabled", false)
@@ -75,7 +71,15 @@ public class EventAll extends BaseOperator {
                                     .put("value", value)
                             )
                     );
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
 
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10 * 1000).build();
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+
+        try {
             HttpPost request = new HttpPost(this.url);
             StringEntity params = new StringEntity(json.toString());
             request.addHeader("content-type", "application/json");
