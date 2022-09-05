@@ -23,15 +23,31 @@ public class Operator {
     public static void main(String[] args) {
         Stream stream  = new Stream();
         Config config = ConfigProvider.getConfig();
+
+        String userToken = config.getConfigValue("userToken", "");
+
         String converterUrl = config.getConfigValue("converterUrl", "");
         String convertFrom = config.getConfigValue("convertFrom", "");
         String convertTo = config.getConfigValue("convertTo", "");
-        String userToken = config.getConfigValue("userToken", "");
         String castExtension = config.getConfigValue("castExtensions", "");
         String extendedConverterUrl = config.getConfigValue("extendedConverterUrl", "");
         String topicToPathAndCharacteristic = config.getConfigValue("topicToPathAndCharacteristic", "");
 
-        Converter converter = new Converter(extendedConverterUrl, converterUrl, convertFrom, convertTo, topicToPathAndCharacteristic, castExtension);
+        String marshallerUrl = config.getConfigValue("marshallerUrl", "");
+        String path = config.getConfigValue("path", "");
+        String functionId = config.getConfigValue("functionId", "");
+        String aspectNodeId = config.getConfigValue("aspectNodeId", "");
+        String targetCharacteristicId = config.getConfigValue("targetCharacteristicId", "");
+        String topicToServiceId = config.getConfigValue("topicToServiceId", "");
+
+
+        ConverterInterface converter;
+        if(marshallerUrl.equals("")) {
+            converter = new Converter(extendedConverterUrl, converterUrl, convertFrom, convertTo, topicToPathAndCharacteristic, castExtension);
+        } else {
+            converter = new Marshaller(marshallerUrl, userToken, functionId, aspectNodeId, path, targetCharacteristicId, topicToServiceId);
+        }
+
         EventAll filter = new EventAll(
                 userToken,
                 config.getConfigValue("url", ""),

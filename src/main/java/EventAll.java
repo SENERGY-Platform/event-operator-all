@@ -38,10 +38,10 @@ import java.io.IOException;
 public class EventAll extends BaseOperator {
     private String url;
     private String eventId;
-    private Converter converter;
+    private ConverterInterface converter;
     private String userToken;
 
-    public EventAll(String userToken, String url, String eventId, Converter converter) {
+    public EventAll(String userToken, String url, String eventId, ConverterInterface converter) {
         this.url = url;
         this.eventId = eventId;
         this.converter = converter;
@@ -59,7 +59,7 @@ public class EventAll extends BaseOperator {
         }
     }
 
-    private Object getValueOfInput(FlexInput input) throws IOException, NoValueException {
+    private Object getValueOfInput(FlexInput input) throws Exception {
         return this.converter.convert(input, input.getValue(Object.class));
     }
 

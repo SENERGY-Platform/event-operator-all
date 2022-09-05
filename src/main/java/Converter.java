@@ -30,7 +30,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.*;
 
-public class Converter {
+public class Converter implements ConverterInterface {
     private String url;
     private String extendedUrl;
     private String from;
@@ -60,7 +60,7 @@ public class Converter {
         return this.convert(this.from, this.to, in);
     }
 
-    public Object convert(FlexInput input, Object value) throws IOException {
+    public Object convert(FlexInput input, Object value) throws Exception {
         String fromCharacteristic = this.from;
         if (fromCharacteristic.equals("")) {
             String topic = input.getCurrentInputTopic();
