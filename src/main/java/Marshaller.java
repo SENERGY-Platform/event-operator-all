@@ -31,6 +31,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.infai.ses.senergy.operators.Helper;
+
 import java.nio.charset.StandardCharsets;
 
 public class Marshaller implements ConverterInterface {
@@ -41,8 +43,10 @@ public class Marshaller implements ConverterInterface {
     private String userToken;
     private String characteristicId;
     private Map<String, String> topicToServiceId;
+    private boolean debug;
 
     public Marshaller(String url, String userToken, String functionId, String aspectId, String path, String characteristicId, String topicToServiceId) {
+        this.debug = Boolean.parseBoolean(Helper.getEnv("DEBUG", "false"));
         this.url = url;
         this.userToken = userToken;
         this.functionId = functionId;
@@ -87,6 +91,10 @@ public class Marshaller implements ConverterInterface {
         request.addHeader("content-type", "application/json");
         CloseableHttpResponse resp = httpClient.execute(request);
         String respStr = new BasicResponseHandler().handleResponse(resp);
+        if(this.debug){System.out.println();
+            System.out.println("DEBUG: marshal resp = " + resp.getStatusLine().getStatusCode() + " " + respStr );
+        }
+
         return this.jsonStrToObject(respStr);
     }
 
