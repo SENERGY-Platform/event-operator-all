@@ -77,7 +77,8 @@ public class Marshaller implements ConverterInterface {
         payload.put("aspect_node_id", this.aspectId);
         payload.put("serialized_output", value);
 
-        StringEntity entity = new StringEntity(this.objToJsonStr(payload));
+        String payloadString = this.objToJsonStr(payload);
+        StringEntity entity = new StringEntity(payloadString);
 
         CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         String endpoint = this.url + "/v2/unmarshal/" + URLEncoder.encode(serviceId, StandardCharsets.UTF_8.toString());
@@ -89,6 +90,11 @@ public class Marshaller implements ConverterInterface {
         }
         request.setEntity(entity);
         request.addHeader("content-type", "application/json");
+
+        if(this.debug){System.out.println();
+            System.out.println("DEBUG: marshal request = " + endpoint + "\n " + payloadString );
+        }
+
         CloseableHttpResponse resp = httpClient.execute(request);
         String respStr = new BasicResponseHandler().handleResponse(resp);
         if(this.debug){System.out.println();
