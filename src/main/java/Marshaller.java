@@ -47,6 +47,9 @@ public class Marshaller implements ConverterInterface {
 
     public Marshaller(String url, String userToken, String functionId, String aspectId, String path, String characteristicId, String topicToServiceId) {
         this.debug = Boolean.parseBoolean(Helper.getEnv("DEBUG", "false"));
+        if(this.debug){
+            System.out.println("DEBUG: start with debug log");
+        }
         this.url = url;
         this.userToken = userToken;
         this.functionId = functionId;
