@@ -67,6 +67,9 @@ public class Marshaller implements ConverterInterface {
     }
 
     public Object convert(FlexInput input, Object value) throws Exception{
+        if(this.debug){System.out.println();
+            System.out.println("DEBUG: convert " + value.toString());
+        }
         String topic = input.getCurrentInputTopic();
         String serviceId = this.topicToServiceId.getOrDefault(topic, topic);
 

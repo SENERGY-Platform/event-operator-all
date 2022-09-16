@@ -129,4 +129,12 @@ public class EventAllWithMarshallerTest {
         test(4.2, true, "{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":4.2}");
     }
 
+
+    @Test
+    public void complex() throws IOException {
+        Map m = new HashMap<String, Object>();
+        m.put("foo", "bar");
+        m.put("batz", 42);
+        test(m, true, "{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":{\"foo\":\"bar\",\"batz\":42}}");
+    }
 }
