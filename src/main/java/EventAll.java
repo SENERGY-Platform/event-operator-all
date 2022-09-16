@@ -21,10 +21,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.infai.ses.senergy.models.InputMessageModel;
-import org.infai.ses.senergy.operators.BaseOperator;
-import org.infai.ses.senergy.operators.FlexInput;
-import org.infai.ses.senergy.operators.Input;
-import org.infai.ses.senergy.operators.Message;
+import org.infai.ses.senergy.operators.*;
 import org.json.JSONObject;
 import org.infai.ses.senergy.exceptions.NoValueException;
 import org.json.JSONException;
@@ -41,8 +38,10 @@ public class EventAll extends BaseOperator {
     private String eventId;
     private ConverterInterface converter;
     private String userToken;
+    private boolean debug;
 
     public EventAll(String userToken, String url, String eventId, ConverterInterface converter) {
+        this.debug = Boolean.parseBoolean(Helper.getEnv("DEBUG", "false"));
         this.url = url;
         this.eventId = eventId;
         this.converter = converter;
@@ -52,6 +51,9 @@ public class EventAll extends BaseOperator {
     @Override
     public void run(Message message) {
         try{
+            if(this.debug){
+                System.out.println("DEBUG: got message");
+            }
             FlexInput input = message.getFlexInput("value");
             Object value = this.getValueOfInput(input);
             this.trigger(value);

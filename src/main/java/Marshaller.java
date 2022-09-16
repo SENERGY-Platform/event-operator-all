@@ -70,7 +70,7 @@ public class Marshaller implements ConverterInterface {
     }
 
     public Object convert(FlexInput input, Object value) throws Exception{
-        if(this.debug){System.out.println();
+        if(this.debug){
             System.out.println("DEBUG: convert " + value.toString());
         }
         String topic = input.getCurrentInputTopic();
@@ -103,7 +103,7 @@ public class Marshaller implements ConverterInterface {
 
         CloseableHttpResponse resp = httpClient.execute(request);
         String respStr = new BasicResponseHandler().handleResponse(resp);
-        if(this.debug){System.out.println();
+        if(this.debug){
             System.out.println("DEBUG: marshal resp = " + resp.getStatusLine().getStatusCode() + " " + respStr );
         }
 
