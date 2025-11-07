@@ -60,11 +60,10 @@ public class EventAllWithoutConverterInterfaceTest {
                 if (
                         jsonObject.containsKey("processVariablesLocal")
                         && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
+                        && ((JSONObject)((JSONObject)jsonObject.get("processVariablesLocal")).get("event")).containsKey("value")
                 ){
                     EventAllWithoutConverterInterfaceTest.called = true;
-                    EventAllWithoutConverterInterfaceTest.processVariable = ( ((JSONObject) jsonObject
-                            .get("processVariablesLocal"))
-                            .get("event"));
+                    EventAllWithoutConverterInterfaceTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event")).get("value");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

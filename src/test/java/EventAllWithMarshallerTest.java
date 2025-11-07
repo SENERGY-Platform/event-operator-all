@@ -70,9 +70,10 @@ public class EventAllWithMarshallerTest {
                 if(
                         jsonObject.containsKey("processVariablesLocal")
                         && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
+                        && ((JSONObject)((JSONObject)jsonObject.get("processVariablesLocal")).get("event")).containsKey("value")
                 ){
                     EventAllWithMarshallerTest.called = true;
-                    EventAllWithMarshallerTest.processVariable = (((JSONObject)jsonObject.get("processVariablesLocal")).get("event"));
+                    EventAllWithMarshallerTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event")).get("value");;
                 }
             } catch (Exception e) {
                 e.printStackTrace();

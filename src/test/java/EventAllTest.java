@@ -60,9 +60,10 @@ public class EventAllTest {
                 if(
                         jsonObject.containsKey("processVariablesLocal")
                         && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
+                        && ((JSONObject)((JSONObject)jsonObject.get("processVariablesLocal")).get("event")).containsKey("value")
                 ){
                     EventAllTest.called = true;
-                    EventAllTest.processVariable = (((JSONObject)jsonObject.get("processVariablesLocal")).get("event"));
+                    EventAllTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event")).get("value");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

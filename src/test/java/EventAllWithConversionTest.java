@@ -59,9 +59,10 @@ public class EventAllWithConversionTest {
                 if(
                         jsonObject.containsKey("processVariablesLocal")
                         && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
+                        && ((JSONObject)((JSONObject)jsonObject.get("processVariablesLocal")).get("event")).containsKey("value")
                 ){
                     EventAllWithConversionTest.called = true;
-                    EventAllWithConversionTest.processVariable = (((JSONObject)jsonObject.get("processVariablesLocal")).get("event"));
+                    EventAllWithConversionTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event")).get("value");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

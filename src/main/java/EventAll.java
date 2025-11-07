@@ -90,7 +90,8 @@ public class EventAll extends BaseOperator {
                     .put("resultEnabled", false)
                     .put("tenantId", this.tenantId)
                     .put("processVariablesLocal", new JSONObject()
-                            .put("event", value));
+                            .put("event", new JSONObject()
+                                .put("value", value)));
         } catch (Exception e) {
             e.printStackTrace();
             return;
