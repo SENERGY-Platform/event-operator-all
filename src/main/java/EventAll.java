@@ -27,8 +27,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.Optional;
+import java.io.BufferedReader;
 import java.io.IOException;
-
+import java.io.InputStreamReader;
 
 public class EventAll extends BaseOperator {
     private String url;
@@ -38,7 +39,8 @@ public class EventAll extends BaseOperator {
     private String tenantId;
     private boolean debug;
 
-    public EventAll(String tenantId, String userToken, String url, String eventId, Optional<ConverterInterface> converter) {
+    public EventAll(String tenantId, String userToken, String url, String eventId,
+            Optional<ConverterInterface> converter) {
         this.debug = Boolean.parseBoolean(Helper.getEnv("DEBUG", "false"));
         this.url = url;
         this.eventId = eventId;
@@ -49,14 +51,14 @@ public class EventAll extends BaseOperator {
 
     @Override
     public void run(Message message) {
-        try{
-            if(this.debug){
+        try {
+            if (this.debug) {
                 System.out.println("DEBUG: got message");
             }
             FlexInput input = message.getFlexInput("value");
             Object value = this.getValueOfInput(input);
             this.trigger(value);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -68,10 +70,10 @@ public class EventAll extends BaseOperator {
         return this.converter.get().convert(input, input.getValue(Object.class));
     }
 
-    private void trigger(Object value){
+    private void trigger(Object value) {
         JSONObject json;
         try {
-            if(mustBeMarshalled(value)) {
+            if (mustBeMarshalled(value)) {
                 value = this.objToJsonStr(value);
             }
             json = new JSONObject()
@@ -80,8 +82,7 @@ public class EventAll extends BaseOperator {
                     .put("resultEnabled", false)
                     .put("tenantId", this.tenantId)
                     .put("processVariablesLocal", new JSONObject()
-                        .put("event", value)
-                    );
+                            .put("event", value));
         } catch (Exception e) {
             e.printStackTrace();
             return;
@@ -91,7 +92,7 @@ public class EventAll extends BaseOperator {
         CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
 
         try {
-            if(this.debug){
+            if (this.debug) {
                 System.out.println("Calling: POST " + this.url + " with body: " + json.toString());
             }
             HttpPost request = new HttpPost(this.url);
@@ -102,8 +103,14 @@ public class EventAll extends BaseOperator {
             }
             request.setEntity(params);
             CloseableHttpResponse resp = httpClient.execute(request);
-             if(this.debug){
-                System.out.println("Response Code: " + resp.getStatusLine().getStatusCode());
+            if (this.debug) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
+                StringBuilder result = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+                System.out.println("Response Code: " + resp.getStatusLine().getStatusCode() + ", Body: " + result.toString());
             }
             resp.close();
         } catch (Exception e) {
@@ -130,19 +137,16 @@ public class EventAll extends BaseOperator {
         return writer.toString();
     }
 
-    public static boolean mustBeMarshalled(Object object)
-    {
+    public static boolean mustBeMarshalled(Object object) {
         Class<?> clazz = object.getClass();
         return !(object instanceof String) && !clazz.isPrimitive() && !isWrapperType(clazz);
     }
 
-    public static boolean isWrapperType(Class<?> clazz)
-    {
+    public static boolean isWrapperType(Class<?> clazz) {
         return getWrapperTypes().contains(clazz);
     }
 
-    private static Set<Class<?>> getWrapperTypes()
-    {
+    private static Set<Class<?>> getWrapperTypes() {
         Set<Class<?>> ret = new HashSet<Class<?>>();
         ret.add(Boolean.class);
         ret.add(Character.class);
