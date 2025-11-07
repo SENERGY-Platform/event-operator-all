@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import java.util.Optional;
+
 import org.infai.ses.senergy.operators.Config;
 import org.infai.ses.senergy.operators.Stream;
 import org.infai.ses.senergy.utils.ConfigProvider;
@@ -41,11 +43,11 @@ public class Operator {
         String topicToServiceId = config.getConfigValue("topicToServiceId", "");
 
 
-        ConverterInterface converter;
+        Optional<ConverterInterface> converter = Optional.empty();
         if(marshallerUrl.equals("")) {
-            converter = new Converter(extendedConverterUrl, converterUrl, convertFrom, convertTo, topicToPathAndCharacteristic, castExtension);
-        } else {
-            converter = new Marshaller(marshallerUrl, userToken, functionId, aspectNodeId, path, targetCharacteristicId, topicToServiceId);
+            converter = Optional.of(new Converter(extendedConverterUrl, converterUrl, convertFrom, convertTo, topicToPathAndCharacteristic, castExtension));
+        } else if (!converterUrl.equals("")) {
+            converter = Optional.of(new Marshaller(marshallerUrl, userToken, functionId, aspectNodeId, path, targetCharacteristicId, topicToServiceId));
         }
 
         EventAll filter = new EventAll(

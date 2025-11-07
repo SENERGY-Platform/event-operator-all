@@ -20,27 +20,24 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.infai.ses.senergy.models.InputMessageModel;
 import org.infai.ses.senergy.operators.*;
 import org.json.JSONObject;
-import org.infai.ses.senergy.exceptions.NoValueException;
-import org.json.JSONException;
 import java.io.StringWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Set;
 import java.util.HashSet;
-
+import java.util.Optional;
 import java.io.IOException;
 
 
 public class EventAll extends BaseOperator {
     private String url;
     private String eventId;
-    private ConverterInterface converter;
+    private Optional<ConverterInterface> converter;
     private String userToken;
     private boolean debug;
 
-    public EventAll(String userToken, String url, String eventId, ConverterInterface converter) {
+    public EventAll(String userToken, String url, String eventId, Optional<ConverterInterface> converter) {
         this.debug = Boolean.parseBoolean(Helper.getEnv("DEBUG", "false"));
         this.url = url;
         this.eventId = eventId;
@@ -63,7 +60,10 @@ public class EventAll extends BaseOperator {
     }
 
     private Object getValueOfInput(FlexInput input) throws Exception {
-        return this.converter.convert(input, input.getValue(Object.class));
+        if (!this.converter.isPresent()) {
+            return input.getValue(Object.class);
+        }
+        return this.converter.get().convert(input, input.getValue(Object.class));
     }
 
     private void trigger(Object value){

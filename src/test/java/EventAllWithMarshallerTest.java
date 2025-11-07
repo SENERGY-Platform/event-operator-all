@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 
 public class EventAllWithMarshallerTest {
@@ -83,7 +84,7 @@ public class EventAllWithMarshallerTest {
 
         ConverterInterface converter = new Marshaller(mockUrl, "userToken", "function-id", "aspect-id", "", "outputCharacteristic", "{\"test\":\"service-id\"}");
 
-        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", converter);
+        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(converter));
 
         Config config = new Config(new JSONHelper().parseFile("config.json").toString());
         ConfigProvider.setConfig(config);
