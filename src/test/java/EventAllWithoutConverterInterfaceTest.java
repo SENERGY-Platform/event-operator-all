@@ -46,7 +46,7 @@ public class EventAllWithoutConverterInterfaceTest {
         if (candidate instanceof Long) {
             candidate = Double.valueOf((Long) candidate);
         } else if (candidate instanceof JSONObject) {
-            candidate = ((JSONObject)candidate).toJSONString();
+            candidate = ((JSONObject) candidate).toJSONString();
         }
         return candidate;
     }
@@ -57,21 +57,22 @@ public class EventAllWithoutConverterInterfaceTest {
             JSONParser jsonParser = new JSONParser();
             try {
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-                if (jsonObject.containsKey("processVariables")
-                        && ((JSONObject) jsonObject.get("processVariables")).containsKey("event")
-                        && ((JSONObject) ((JSONObject) jsonObject.get("processVariables")).get("event"))
-                                .containsKey("value")) {
+                if (
+                        jsonObject.containsKey("processVariablesLocal")
+                        && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
+                ){
                     EventAllWithoutConverterInterfaceTest.called = true;
-                    EventAllWithoutConverterInterfaceTest.processVariable = ((JSONObject) ((JSONObject) jsonObject
-                            .get("processVariables"))
-                            .get("event")).get("value");
+                    EventAllWithoutConverterInterfaceTest.processVariable = ( ((JSONObject) jsonObject
+                            .get("processVariablesLocal"))
+                            .get("event"));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        EventAll events = new EventAll("", "http://localhost:" + server.getAddress().getPort() + "/endpoint", "test",
+        EventAll events = new EventAll("", "", "http://localhost:" + server.getAddress().getPort() + "/endpoint", "test",
                 Optional.empty());
+                
 
         Config config = new Config(new JSONHelper().parseFile("config.json").toString());
         ConfigProvider.setConfig(config);

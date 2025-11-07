@@ -35,14 +35,16 @@ public class EventAll extends BaseOperator {
     private String eventId;
     private Optional<ConverterInterface> converter;
     private String userToken;
+    private String tenantId;
     private boolean debug;
 
-    public EventAll(String userToken, String url, String eventId, Optional<ConverterInterface> converter) {
+    public EventAll(String tenantId, String userToken, String url, String eventId, Optional<ConverterInterface> converter) {
         this.debug = Boolean.parseBoolean(Helper.getEnv("DEBUG", "false"));
         this.url = url;
         this.eventId = eventId;
         this.converter = converter;
         this.userToken = userToken;
+        this.tenantId = tenantId;
     }
 
     @Override
@@ -76,10 +78,9 @@ public class EventAll extends BaseOperator {
                     .put("messageName", this.eventId)
                     .put("all", true)
                     .put("resultEnabled", false)
-                    .put("processVariables", new JSONObject()
-                            .put("event", new JSONObject()
-                                    .put("value", value)
-                            )
+                    .put("tenantId", this.tenantId)
+                    .put("processVariablesLocal", new JSONObject()
+                        .put("event", value)
                     );
         } catch (Exception e) {
             e.printStackTrace();

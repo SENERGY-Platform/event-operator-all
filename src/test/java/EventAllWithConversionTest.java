@@ -57,12 +57,11 @@ public class EventAllWithConversionTest {
             try {
                 JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
                 if(
-                        jsonObject.containsKey("processVariables")
-                        && ((JSONObject)jsonObject.get("processVariables")).containsKey("event")
-                        && ((JSONObject)((JSONObject)jsonObject.get("processVariables")).get("event")).containsKey("value")
+                        jsonObject.containsKey("processVariablesLocal")
+                        && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
                 ){
                     EventAllWithConversionTest.called = true;
-                    EventAllWithConversionTest.processVariable = ((JSONObject)((JSONObject)jsonObject.get("processVariables")).get("event")).get("value");
+                    EventAllWithConversionTest.processVariable = (((JSONObject)jsonObject.get("processVariablesLocal")).get("event"));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -71,7 +70,7 @@ public class EventAllWithConversionTest {
         HttpServer converterServer = ConverterServerMock.create("/inCharacteristic/outCharacteristic");
         String mockUrl = "http://localhost:"+converterServer.getAddress().getPort();
         Converter converter = new Converter(mockUrl, mockUrl, "inCharacteristic", "outCharacteristic");
-        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(converter));
+        EventAll events = new EventAll("","", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(converter));
         Config config = new Config(new JSONHelper().parseFile("config.json").toString());
         ConfigProvider.setConfig(config);
         MessageModel model = new MessageModel();

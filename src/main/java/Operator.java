@@ -27,6 +27,7 @@ public class Operator {
         Config config = ConfigProvider.getConfig();
 
         String userToken = config.getConfigValue("userToken", "");
+        String tenantId = config.getConfigValue("tenantId", "");
 
         String converterUrl = config.getConfigValue("converterUrl", "");
         String convertFrom = config.getConfigValue("convertFrom", "");
@@ -51,6 +52,7 @@ public class Operator {
         }
 
         EventAll filter = new EventAll(
+                tenantId,
                 userToken,
                 config.getConfigValue("url", ""),
                 config.getConfigValue("eventId", ""),

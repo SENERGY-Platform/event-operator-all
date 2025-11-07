@@ -68,12 +68,11 @@ public class EventAllWithMarshallerTest {
             try {
                 JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
                 if(
-                        jsonObject.containsKey("processVariables")
-                        && ((JSONObject)jsonObject.get("processVariables")).containsKey("event")
-                        && ((JSONObject)((JSONObject)jsonObject.get("processVariables")).get("event")).containsKey("value")
+                        jsonObject.containsKey("processVariablesLocal")
+                        && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
                 ){
                     EventAllWithMarshallerTest.called = true;
-                    EventAllWithMarshallerTest.processVariable = ((JSONObject)((JSONObject)jsonObject.get("processVariables")).get("event")).get("value");
+                    EventAllWithMarshallerTest.processVariable = (((JSONObject)jsonObject.get("processVariablesLocal")).get("event"));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -84,7 +83,7 @@ public class EventAllWithMarshallerTest {
 
         ConverterInterface converter = new Marshaller(mockUrl, "userToken", "function-id", "aspect-id", "", "outputCharacteristic", "{\"test\":\"service-id\"}");
 
-        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(converter));
+        EventAll events = new EventAll("", "", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(converter));
 
         Config config = new Config(new JSONHelper().parseFile("config.json").toString());
         ConfigProvider.setConfig(config);

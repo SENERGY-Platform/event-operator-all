@@ -58,18 +58,17 @@ public class EventAllTest {
             try {
                 JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
                 if(
-                        jsonObject.containsKey("processVariables")
-                        && ((JSONObject)jsonObject.get("processVariables")).containsKey("event")
-                        && ((JSONObject)((JSONObject)jsonObject.get("processVariables")).get("event")).containsKey("value")
+                        jsonObject.containsKey("processVariablesLocal")
+                        && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
                 ){
                     EventAllTest.called = true;
-                    EventAllTest.processVariable = ((JSONObject)((JSONObject)jsonObject.get("processVariables")).get("event")).get("value");
+                    EventAllTest.processVariable = (((JSONObject)jsonObject.get("processVariablesLocal")).get("event"));
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        EventAll events = new EventAll("", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(new Converter("", "", "", "")));
+        EventAll events = new EventAll("", "", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(new Converter("", "", "", "")));
         Config config = new Config(new JSONHelper().parseFile("config.json").toString());
         ConfigProvider.setConfig(config);
         MessageModel model = new MessageModel();
