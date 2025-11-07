@@ -1,10 +1,10 @@
-FROM maven:3-eclipse-temurin-25-alpine AS builder
+FROM maven:3-eclipse-temurin-25-noble AS builder
 ADD src /usr/src/app/src
 ADD pom.xml /usr/src/app
 WORKDIR /usr/src/app
 RUN mvn clean install
 
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:25-jre-noble
 LABEL org.opencontainers.image.source=https://github.com/SENERGY-Platform/event-operator-all
 ENV NAME=event-all
 COPY --from=builder /usr/src/app/target/${NAME}-jar-with-dependencies.jar /opt/operator.jar
