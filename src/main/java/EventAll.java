@@ -47,6 +47,14 @@ public class EventAll extends BaseOperator {
         this.converter = converter;
         this.userToken = userToken;
         this.tenantId = tenantId;
+        if (this.debug) {
+            System.out.println("DEBUG: Configuration:");
+            System.out.println("  URL: " + this.url);
+            System.out.println("  Event ID: " + this.eventId);
+            System.out.println("  Converter Present: " + this.converter.isPresent());
+            System.out.println("  Tenant ID: " + this.tenantId);
+            System.out.println("  User Token: " + this.userToken);
+        }
     }
 
     @Override
