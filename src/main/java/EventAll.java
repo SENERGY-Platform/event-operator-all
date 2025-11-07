@@ -91,6 +91,9 @@ public class EventAll extends BaseOperator {
         CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
 
         try {
+            if(this.debug){
+                System.out.println("Calling: POST " + this.url + " with body: " + json.toString());
+            }
             HttpPost request = new HttpPost(this.url);
             StringEntity params = new StringEntity(json.toString());
             request.addHeader("content-type", "application/json");
@@ -99,6 +102,9 @@ public class EventAll extends BaseOperator {
             }
             request.setEntity(params);
             CloseableHttpResponse resp = httpClient.execute(request);
+             if(this.debug){
+                System.out.println("Response Code: " + resp.getStatusLine().getStatusCode());
+            }
             resp.close();
         } catch (Exception e) {
             e.printStackTrace();
