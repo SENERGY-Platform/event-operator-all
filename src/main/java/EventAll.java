@@ -26,6 +26,8 @@ import java.io.StringWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -72,10 +74,16 @@ public class EventAll extends BaseOperator {
     }
 
     private Object getValueOfInput(FlexInput input) throws Exception {
+        List<Object> values = input.getValues(Object.class);
         if (!this.converter.isPresent()) {
-            return input.getValue(Object.class);
+            return values;
         }
-        return this.converter.get().convert(input, input.getValue(Object.class));
+        List<Object> result = new LinkedList<>();
+        ConverterInterface converter = this.converter.get();
+        for (Object value : values) {
+            result.add(converter.convert(input, value));
+        }
+        return result;
     }
 
     private void trigger(Object value) {

@@ -31,6 +31,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,35 +53,36 @@ public class EventAllWithoutConverterInterfaceTest {
         return candidate;
     }
 
-    private void test(Object messageValue, boolean expectedToTrigger)
+    private void test(Object messageValue, Object messageValue2, boolean expectedToTrigger)
             throws IOException {
         HttpServer server = TriggerServerMock.create(inputStream -> {
             JSONParser jsonParser = new JSONParser();
             try {
                 JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-                if (
-                        jsonObject.containsKey("processVariablesLocal")
-                        && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
-                        && ((JSONObject)((JSONObject)jsonObject.get("processVariablesLocal")).get("event")).containsKey("value")
-                ){
+                if (jsonObject.containsKey("processVariablesLocal")
+                        && ((JSONObject) jsonObject.get("processVariablesLocal")).containsKey("event")
+                        && ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event"))
+                                .containsKey("value")) {
                     EventAllWithoutConverterInterfaceTest.called = true;
-                    EventAllWithoutConverterInterfaceTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event")).get("value");
+                    EventAllWithoutConverterInterfaceTest.processVariable = ((JSONObject) ((JSONObject) jsonObject
+                            .get("processVariablesLocal")).get("event")).get("value");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
-        EventAll events = new EventAll("", "", "http://localhost:" + server.getAddress().getPort() + "/endpoint", "test",
+        EventAll events = new EventAll("", "", "http://localhost:" + server.getAddress().getPort() + "/endpoint",
+                "test",
                 Optional.empty());
-                
 
-        Config config = new Config(new JSONHelper().parseFile("config.json").toString());
+        Config config = new Config(new JSONHelper().parseFile("config-2.json").toString());
         ConfigProvider.setConfig(config);
         MessageModel model = new MessageModel();
         Message message = new Message();
         events.configMessage(message);
-        JSONObject m = new JSONHelper().parseFile("message.json");
+        JSONObject m = new JSONHelper().parseFile("message-2.json");
         ((JSONObject) ((JSONObject) m.get("value")).get("reading")).put("value", messageValue);
+        ((JSONObject) ((JSONObject) m.get("value")).get("reading")).put("value2", messageValue2);
         DeviceMessageModel deviceMessageModel = JSONHelper.getObjectFromJSONString(m.toString(),
                 DeviceMessageModel.class);
         assert deviceMessageModel != null;
@@ -94,8 +97,15 @@ public class EventAllWithoutConverterInterfaceTest {
         if (expectedToTrigger) {
             try {
                 Object a = jsonNormalize(EventAllWithoutConverterInterfaceTest.processVariable);
-                Object b = jsonNormalize(messageValue);
-                Assert.assertEquals(a, b);
+                List<Object> list = new LinkedList<>();
+                if (messageValue != null) {
+                    list.add(messageValue);
+                }
+                if (messageValue2 != null) {
+                    list.add(messageValue2);
+                }
+                Object b = jsonNormalize(list);
+                Assert.assertEquals(a.toString(), b.toString());
             } catch (ParseException e) {
                 Assert.fail(e.getMessage());
             }
@@ -104,17 +114,22 @@ public class EventAllWithoutConverterInterfaceTest {
 
     @Test
     public void string() throws IOException {
-        test("foobar", true);
+        test("foobar", "foobar", true);
     }
 
     @Test
-    public void integer() throws IOException {
-        test(42, true);
+    public void mixed() throws IOException {
+        test(42, "foobar", true);
+    }
+
+    @Test
+    public void mixedWithNull() throws IOException {
+        test(42, null, true);
     }
 
     @Test
     public void floatpoint() throws IOException {
-        test(4.2, true);
+        test(4.2, 4.2, true);
     }
 
     @Test
@@ -122,6 +137,6 @@ public class EventAllWithoutConverterInterfaceTest {
         Map m = new HashMap<String, Object>();
         m.put("foo", "bar");
         m.put("batz", 42);
-        test(m, true);
+        test(m, m, true);
     }
 }
