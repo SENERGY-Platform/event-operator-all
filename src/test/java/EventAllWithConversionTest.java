@@ -31,9 +31,10 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 
 public class EventAllWithConversionTest {
     public static boolean called = false;
@@ -43,9 +44,9 @@ public class EventAllWithConversionTest {
         Map<String, Object> wrapper = new HashMap<String, Object>();
         wrapper.put("value", in);
         JSONObject temp = new JSONObject(wrapper);
-        Object candidate = ((JSONObject)(new JSONParser().parse(temp.toJSONString()))).get("value");
-        if(candidate instanceof Long){
-            candidate = Double.valueOf((Long)candidate);
+        Object candidate = ((JSONObject) (new JSONParser().parse(temp.toJSONString()))).get("value");
+        if (candidate instanceof Long) {
+            candidate = Double.valueOf((Long) candidate);
         }
         return candidate;
     }
@@ -55,31 +56,33 @@ public class EventAllWithConversionTest {
         HttpServer server = TriggerServerMock.create(inputStream -> {
             JSONParser jsonParser = new JSONParser();
             try {
-                JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
-                if(
-                        jsonObject.containsKey("processVariablesLocal")
-                        && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
-                        && ((JSONObject)((JSONObject)jsonObject.get("processVariablesLocal")).get("event")).containsKey("value")
-                ){
+                JSONObject jsonObject = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
+                if (jsonObject.containsKey("processVariablesLocal")
+                        && ((JSONObject) jsonObject.get("processVariablesLocal")).containsKey("event")
+                        && ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event"))
+                                .containsKey("value")) {
                     EventAllWithConversionTest.called = true;
-                    EventAllWithConversionTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event")).get("value");
+                    EventAllWithConversionTest.processVariable = ((JSONObject) ((JSONObject) jsonObject
+                            .get("processVariablesLocal")).get("event")).get("value");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
         HttpServer converterServer = ConverterServerMock.create("/inCharacteristic/outCharacteristic");
-        String mockUrl = "http://localhost:"+converterServer.getAddress().getPort();
+        String mockUrl = "http://localhost:" + converterServer.getAddress().getPort();
         Converter converter = new Converter(mockUrl, mockUrl, "inCharacteristic", "outCharacteristic");
-        EventAll events = new EventAll("","", "http://localhost:"+server.getAddress().getPort()+"/endpoint", "test", Optional.of(converter));
+        EventAll events = new EventAll("", "", "http://localhost:" + server.getAddress().getPort() + "/endpoint",
+                "test", Optional.of(converter));
         Config config = new Config(new JSONHelper().parseFile("config.json").toString());
         ConfigProvider.setConfig(config);
         MessageModel model = new MessageModel();
         Message message = new Message();
         events.configMessage(message);
         JSONObject m = new JSONHelper().parseFile("message.json");
-        ((JSONObject)((JSONObject) m.get("value")).get("reading")).put("value", messageValue);
-        DeviceMessageModel deviceMessageModel = JSONHelper.getObjectFromJSONString(m.toString(), DeviceMessageModel.class);
+        ((JSONObject) ((JSONObject) m.get("value")).get("reading")).put("value", messageValue);
+        DeviceMessageModel deviceMessageModel = JSONHelper.getObjectFromJSONString(m.toString(),
+                DeviceMessageModel.class);
         assert deviceMessageModel != null;
         String topicName = config.getInputTopicsConfigs().get(0).getName();
         model.putMessage(topicName, Helper.deviceToInputMessageModel(deviceMessageModel, topicName));
@@ -87,11 +90,13 @@ public class EventAllWithConversionTest {
         events.run(message);
         server.stop(0);
         Assert.assertEquals(EventAllWithConversionTest.called, expectedToTrigger);
-        if(expectedToTrigger){
+        if (expectedToTrigger) {
             try {
                 Object a = jsonNormalize(EventAllWithConversionTest.processVariable);
-                Object b = jsonNormalize(messageValue);
-                Assert.assertEquals(a, b);
+                List<Object> list = new LinkedList<>();
+                list.add(messageValue);
+                Object b = jsonNormalize(list);
+                Assert.assertEquals(a.toString(), b.toString());
             } catch (ParseException e) {
                 Assert.fail(e.getMessage());
             }
@@ -100,13 +105,12 @@ public class EventAllWithConversionTest {
 
     @Test
     public void string() throws IOException {
-        test("foobar",true);
+        test("foobar", true);
     }
-
 
     @Test
     public void integer() throws IOException {
-        test(42,true);
+        test(42, true);
     }
 
     @Test

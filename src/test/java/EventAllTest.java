@@ -22,7 +22,6 @@ import org.infai.ses.senergy.operators.Helper;
 import org.infai.ses.senergy.operators.Message;
 import org.infai.ses.senergy.testing.utils.JSONHelper;
 import org.infai.ses.senergy.utils.ConfigProvider;
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -32,6 +31,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -88,8 +89,10 @@ public class EventAllTest {
         if(expectedToTrigger){
             try {
                 Object a = jsonNormalize(EventAllTest.processVariable);
-                Object b = jsonNormalize(messageValue);
-                Assert.assertEquals(a, b);
+                List<Object> list = new LinkedList<>();
+                list.add(messageValue);
+                Object b = jsonNormalize(list);
+                Assert.assertEquals(a.toString(), b.toString());
             } catch (ParseException e) {
                 Assert.fail(e.getMessage());
             }

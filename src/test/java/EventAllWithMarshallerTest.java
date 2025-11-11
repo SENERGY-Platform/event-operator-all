@@ -31,6 +31,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -105,9 +107,14 @@ public class EventAllWithMarshallerTest {
         Assert.assertEquals(expectedToTrigger, EventAllWithMarshallerTest.called);
         if(expectedToTrigger){
             try {
-                Object a = expectedMarshallerEcho;
-                Object b = jsonNormalize(EventAllWithMarshallerTest.processVariable);
-                Assert.assertEquals(a, b);
+                List<Object> listA = new LinkedList<>();
+                listA.add(expectedMarshallerEcho);
+                Object a = jsonNormalize(listA);
+
+                List<Object> listB = new LinkedList<>();
+                listB.add(EventAllWithMarshallerTest.processVariable);
+                Object b = jsonNormalize(listB);
+                Assert.assertEquals(a.toString(), b.toString());
             } catch (ParseException e) {
                 Assert.fail(e.getMessage());
             }
@@ -116,18 +123,18 @@ public class EventAllWithMarshallerTest {
 
     @Test
     public void string() throws IOException {
-        test("foobar",true, "{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":\"foobar\"}");
+        test("foobar",true, "[{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":\"foobar\"}]");
     }
 
 
     @Test
     public void integer() throws IOException {
-        test(42,true, "{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":42}");
+        test(42,true, "[{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":42}]");
     }
 
     @Test
     public void floatpoint() throws IOException {
-        test(4.2, true, "{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":4.2}");
+        test(4.2, true, "[{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":4.2}]");
     }
 
 
@@ -136,6 +143,6 @@ public class EventAllWithMarshallerTest {
         Map m = new HashMap<String, Object>();
         m.put("foo", "bar");
         m.put("batz", 42);
-        test(m, true, "{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":{\"foo\":\"bar\",\"batz\":42}}");
+        test(m, true, "[{\"path\":\"\",\"characteristic_id\":\"outputCharacteristic\",\"function_id\":\"function-id\",\"aspect_node_id\":\"aspect-id\",\"serialized_output\":{\"foo\":\"bar\",\"batz\":42}}]");
     }
 }
