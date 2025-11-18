@@ -59,12 +59,12 @@ public class EventAllTest {
             try {
                 JSONObject jsonObject = (JSONObject)jsonParser.parse(new InputStreamReader(inputStream, "UTF-8"));
                 if(
-                        jsonObject.containsKey("processVariablesLocal")
-                        && ((JSONObject)jsonObject.get("processVariablesLocal")).containsKey("event")
-                        && ((JSONObject)((JSONObject)jsonObject.get("processVariablesLocal")).get("event")).containsKey("value")
+                        jsonObject.containsKey("processVariables")
+                        && ((JSONObject)jsonObject.get("processVariables")).containsKey("event")
+                        && ((JSONObject)((JSONObject)jsonObject.get("processVariables")).get("event")).containsKey("value")
                 ){
                     EventAllTest.called = true;
-                    EventAllTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariablesLocal")).get("event")).get("value");
+                    EventAllTest.processVariable = ((JSONObject) ((JSONObject) jsonObject.get("processVariables")).get("event")).get("value");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
