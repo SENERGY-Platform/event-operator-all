@@ -55,7 +55,7 @@ public class EventAll extends BaseOperator {
             System.out.println("  Event ID: " + this.eventId);
             System.out.println("  Converter Present: " + this.converter.isPresent());
             System.out.println("  Tenant ID: " + this.tenantId);
-            System.out.println("  User Token: " + this.userToken);
+            System.out.println("  User Token Set: " + (this.userToken != null && !this.userToken.isEmpty()));
         }
     }
 
